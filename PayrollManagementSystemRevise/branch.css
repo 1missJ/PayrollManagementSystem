@@ -1,0 +1,542 @@
+ /* General Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #ffe4c4;
+        }
+
+        .header {
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff3e0;
+            border-top: 1px solid #ccc;
+            padding: 0 20px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 1;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 50px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .admin-text {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .logout-icon {
+            font-size: 1.5rem;
+            color: black;
+            text-decoration: none;
+        }
+
+        .sidebar {
+            width: 250px;
+            padding-top: 110px;
+            background-color: #ffa07a;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            width: 100%;
+        }
+
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar ul li.active a {
+            background-color: #ff8c66;
+        }
+
+        .icon {
+            margin-right: 10px;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding-top: 100px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            background-color: #ffe4c4;
+        }
+
+        .Branch-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border: 2px solid #f4a460;
+            margin-top: 100px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .Branch-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #f4a460;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .Branch-form input, .Branch-form select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn-save {
+            background-color: #ffa07a;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background-color: #ffa07a;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #ccc;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .Branch-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .Branch-table th, .Branch-table td {
+            border: 1px solid #ccc;
+            background-color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .Branch-table th {
+            background-color: white;
+            color: black;
+            font-weight: bold;
+        }
+        .logout-icon {
+            font-size: 1.5rem;
+            color: black;
+            text-decoration: none;
+        }
+        .logout-overlay {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin-top: 60px;
+           margin-left: 1100px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        .logout-content {
+            background-color: #fff;
+            padding: 20px;
+            width: 400px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content:space-evenly;
+            margin-top: 50px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 5px 10px;
+            background-color: #ffffff;
+        }
+
+        .search-bar {
+            border: none;
+            outline: none;
+            width: 200px;
+            font-size: 1rem;
+            background-color: transparent;
+        }
+
+        .search-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .add-Employee-btn {
+            padding: 8px 12px;
+            font-size: 1rem;
+            background-color: #ffa07a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .confirm-btn {
+            background-color: #ffa07a;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #ccc;
+            color: black;
+        }
+        .confirm-btn, .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-body,
+        .modal-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* Center the select dropdown */
+    .form-group select {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+        .logout-header {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+              /* Modal Styling */
+              .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+/* Modal Content */
+.modal-content {
+    width: 50%; /* Adjust the width of the modal */
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Modal Body */
+.modal-body {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between the left and right columns */
+}
+
+/* Left Column (First Name, Last Name, etc.) */
+.left-column {
+    flex: 1;
+}
+
+/* Right Column (Middle Name, Address, etc.) */
+.right-column {
+    flex: 1;
+}
+
+        /* Form Group (for each input field) */
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between label and input */
+    margin-bottom: 15px; /* Space between form groups */
+}
+
+/* Labels */
+.modal-body label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    width: 150px; /* Fixed width for labels to ensure they align properly */
+}
+
+/* Input Fields */
+.modal-body input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Inputs take the remaining space */
+    box-sizing: border-box;
+}
+
+/* Date Inputs */
+.modal-body input[type="date"] {
+    width: 100%;
+    padding: 10px;
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-footer .save-btn,
+.modal-footer .cancel-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-footer .save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #fff3e0;
+            font-size: 0.9rem;
+            color: #333;
+            border-top: 1px solid #ccc;
+            z-index: 1;
+        }
+
+/* Table Styling */
+table.Branch-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.Branch-table th, .Branch-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Header Styling */
+.Branch-table th {
+    background-color: #f4a460; /* Sand color for header */
+    color: white;
+    font-weight: bold;
+}
+
+/* Row Styling */
+.Branch-table td {
+    background-color: #fff8f0; /* Light background for rows */
+}
+
+/* Action Buttons Layout */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* View Button Styling */
+.view {
+    background-color: #ffeb99;  /* Light Orange background for View */
+    color: black;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.view:hover {
+    background-color: #ffd700;  /* Darker orange on hover */
+}
+
+/* Edit Button Styling */
+.edit {
+    background-color: #4CAF50;  /* Green background for Edit */
+    color: white;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.edit:hover {
+    background-color: #45a049;  /* Darker green on hover */
+}
+
+/* Delete Button Styling */
+.delete {
+    background-color: #f44336; /* Red background for Delete */
+    color: white;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete:hover {
+    background-color: #d32f2f;  /* Darker red on hover */
+}
+
+/* Add Employee Button Styling */
+.add-Employee-btn {
+    background-color: #007BFF; /* Blue color for Add Employee */
+    color: white;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-Employee-btn a {
+    color: white;
+    text-decoration: none;
+}
+
+.add-Employee-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Ensures padding and borders don't affect the element width */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Style for each employee item */
+.employee-item {
+    display: flex;
+    align-items: center; /* Align checkbox and name vertically */
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+/* Style for the checkbox */
+.employee-item input[type="checkbox"] {
+    margin-right: 10px; /* Space between checkbox and label */
+    transform: scale(1.2); /* Slightly enlarge the checkbox */
+}
+
+/* Style for the employee name */
+.employee-item label {
+    margin-left: 10px; /* Space between checkbox and label */
+    font-weight: normal; /* Ensure the label font weight is normal */
+}
+
+/* Additional styling for the form container and fields */
+.multi-select-container {
+    display: block;
+    margin: 10px 0;
+}
+
+.employee-list {
+    padding-left: 0;
+    list-style: none;
+}
