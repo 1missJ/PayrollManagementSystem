@@ -1,0 +1,186 @@
+/* General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #ffe4c4;
+    overflow: hidden;
+}
+
+.content {
+    margin-left: 250px;
+    padding-top: 100px;
+    margin-top: 100px;
+    padding: 20px;
+}
+
+.deduction-box {
+    background-color: #ffffff;
+    padding: 30px;
+    border: 2px solid #f4a460;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 95%;
+    margin: 0 auto 20px auto;
+}
+
+/* Deduction Form */
+.deduction-form {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    max-width: 800px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deduction-form h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.deduction-form input, 
+.deduction-form select {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.deduction-form button {
+    background-color: #ffa07a;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex; 
+    margin-top: 30px; 
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 15px; 
+    padding: 2px 6px; 
+    background-color: #ffffff;
+}
+
+.search-bar {
+    border: none;
+    outline: none;
+    width: 120px;
+    font-size: 0.85rem; 
+    background-color: transparent;
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    font-size: 0.9rem; 
+    cursor: pointer;
+    color: #666;
+    padding: 2px; 
+    margin-left: 40px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.delete {
+    background-color: #f44336; /* Red background for Delete */
+    color: white;
+    font-size: 1.2rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete:hover {
+    background-color: #d32f2f;  /* Darker red on hover */
+}
+
+/* Deduction Table */
+.deduction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.deduction-table th, .deduction-table td {
+    border: 1px solid #ccc;
+    padding: 20px;  /* Increased padding for more spacious rows */
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.deduction-table th {
+    background-color: #f4a460;
+    color: white;
+}
+
+/* Align remove button properly */
+.deduction-table td .remove-btn {
+    background-color: #ff6347;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.deduction-table td.amount-column {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff3e0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Modal Overlays */
+.overlay {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
