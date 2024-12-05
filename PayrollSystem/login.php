@@ -3,9 +3,10 @@ session_start();
 
 $error_message = '';
 $show_modal = false;
+$forgot_password = false;
 
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle login submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
     include_once("connection.php");
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($password === $storedPassword) {
             $_SESSION['user_id'] = $id;
             $_SESSION['Admin_User'] = $username;
-            $show_modal = true;
+            $show_modal = true; // Display the security questions modal
         } else {
             $error_message = "Invalid password. Please try again.";
         }
@@ -32,6 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt->close();
     $conn->close();
+}
+
+// Handle forgot password
+if (isset($_GET['forgot_password']) && $_GET['forgot_password'] === 'true') {
+    $forgot_password = true;
 }
 
 if (isset($_GET['error'])) {
@@ -142,13 +148,13 @@ if (isset($_GET['error'])) {
                     <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
                 <button type="submit">LOGIN</button><br><br>
-                <a href="#" class="forgot-password">Forgot Password?</a>
+                <a href="?forgot_password=true" class="forgot-password">Forgot Password?</a>
             </form>
         </div>
     </div>
 
     <!-- Security Questions Modal -->
-    <?php if ($show_modal): ?>
+    <?php if ($show_modal || $forgot_password): ?>
     <div class="modal fade show" id="securityModal" tabindex="-1" role="dialog" aria-labelledby="securityModalLabel" aria-hidden="true" style="display: block;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -158,7 +164,7 @@ if (isset($_GET['error'])) {
                 <div class="modal-body">
                     <form id="securityForm" method="POST" action="verify_security.php">
                         <div class="form-group">
-                            <label for="answer1">What is your hobby?</label>
+                            <label for="answer1">What is your Middle Name?</label>
                             <input type="text" class="form-control" id="answer1" name="answer1" autocomplete="off" required>
                         </div>
                         <div class="form-group">
