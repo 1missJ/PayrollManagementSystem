@@ -2,65 +2,76 @@
 session_start();
 
 if (!isset($_SESSION['Admin_User'])) {
-    header("Location: login.php"); 
+    header("Location: login.php");
     exit;
 }
+
 // Connect to the database
 include_once("connection.php");
 
-// Add payroll logic
-if (isset($_POST['action']) && $_POST['action'] == 'add') {
-    $dateFrom = $_POST['dateFrom'];
-    $dateTo = $_POST['dateTo'];
-    $payrollType = $_POST['payrollType'];
+// Default to current month and year if not set
+$month = isset($_GET['month']) ? $_GET['month'] : date('m');
+$year = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
-    $sql = "INSERT INTO payroll (date_from, date_to, payroll_type) VALUES ('$dateFrom', '$dateTo', '$payrollType')";
-    if ($conn->query($sql) === TRUE) {
-        echo json_encode(['success' => true]);
+// Handle adding a new payroll date
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_payroll_date'])) {
+    $newPayrollDate = $_POST['payroll_date'];
+    $stmt = $conn->prepare("INSERT INTO payroll (date) VALUES (?)");
+    $stmt->bind_param("s", $newPayrollDate);
+    if ($stmt->execute()) {
+        echo "<script>alert('Payroll date added successfully'); window.location.href='payrollList.php';</script>";
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $conn->error]);
+        echo "<script>alert('Error adding payroll date');</script>";
     }
-    exit();
 }
 
-// Edit payroll logic
-if (isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $id = $_POST['payrollId'];
-    $dateFrom = $_POST['dateFrom'];
-    $dateTo = $_POST['dateTo'];
-    $payrollType = $_POST['payrollType'];
+// Handle updating a payroll record
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_payroll'])) {
+    $payrollId = $_POST['payroll_id'];
+    $payrollDate = $_POST['payroll_date'];
 
-    $sql = "UPDATE payroll SET date_from = '$dateFrom', date_to = '$dateTo', payroll_type = '$payrollType' WHERE id = '$id'";
-    if ($conn->query($sql) === TRUE) {
-        echo json_encode(['success' => true]);
+    // Update payroll record in the database
+    $stmt = $conn->prepare("UPDATE payroll SET date = ? WHERE id = ?");
+    $stmt->bind_param("si", $payrollDate, $payrollId);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Payroll record updated successfully'); window.location.href='payrollList.php';</script>";
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $conn->error]);
+        echo "<script>alert('Error updating payroll record');</script>";
     }
-    exit();
 }
 
-// Delete payroll logic
-if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $id = $_POST['payrollId'];
-    $sql = "DELETE FROM payroll WHERE id = '$id'";
-    if ($conn->query($sql) === TRUE) {
-        echo json_encode(['success' => true]);
+// Handle deleting a payroll record
+if (isset($_GET['delete_id'])) {
+    $payrollId = $_GET['delete_id'];
+
+    // Delete the payroll record from the database
+    $stmt = $conn->prepare("DELETE FROM payroll WHERE id = ?");
+    $stmt->bind_param("i", $payrollId);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Payroll record deleted successfully'); window.location.href='payrollList.php';</script>";
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $conn->error]);
+        echo "<script>alert('Error deleting payroll record');</script>";
     }
-    exit();
 }
 
-// Search query logic
-$searchQuery = "WHERE 1";  // Default to showing all records
+// Query to fetch payroll data
+$sql = "
+    SELECT p.id, p.date, 
+           CONCAT(e.first_name, ' ', e.last_name) AS employee_name, e.position,
+           d.deduction_name, d.amount
+    FROM payroll p
+    LEFT JOIN employees e ON e.id = p.employee_id
+    LEFT JOIN deduction d ON d.id = p.id
+    WHERE MONTH(p.date) = ? AND YEAR(p.date) = ?
+    ORDER BY p.date DESC
+";
 
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $searchTerm = $conn->real_escape_string($_GET['search']);
-    $searchQuery = "WHERE id LIKE '%$searchTerm%' OR date_from LIKE '%$searchTerm%' OR date_to LIKE '%$searchTerm%' OR payroll_type LIKE '%$searchTerm%'";
-}
-
-$sql = "SELECT * FROM payroll $searchQuery ORDER BY payroll_type ASC";
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $month, $year);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -70,6 +81,56 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payroll List</title>
     <link rel="stylesheet" href="./assets/css/payrollList.css">
+    <style>
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            border: none;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content .close-btn {
+            background: #dc3545;
+        }
+    </style>
 </head>
 <body>
 
@@ -79,173 +140,120 @@ $result = $conn->query($sql);
 <!-- sidebar -->
 <?php include_once("./includes/sidebar.php"); ?>
 
-    <main class="content">
-        <div class="welcome-box2">
-            PAYROLL LIST
+<main class="content">
+    <div class="welcome-box2">
+        PAYROLL LIST
+    </div>
+
+    <div class="controls">
+        <div class="search-container">
+            <form method="GET" action="payrollList.php">
+                <label for="month">Month:</label>
+                <select name="month" id="month">
+                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                        <option value="<?= $m ?>" <?= $month == $m ? 'selected' : '' ?>>
+                            <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+
+                <label for="year">Year:</label>
+                <input type="number" name="year" id="year" value="<?= $year ?>" required>
+
+                <button type="submit">Filter</button>
+            </form>
         </div>
 
-        <div class="controls">
-            <div class="search-container">
-                <form method="GET" action="payrollList.php">
-                    <input type="text" name="search" placeholder="Search ID" class="search-bar" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                    <button type="submit" class="search-btn">🔍</button>
-                </form>
-            </div>
-            <button class="add-payroll-btn" onclick="showModal()">+ Add Payroll</button>
-        </div>
+        <button onclick="showModal()">Add Payroll Date</button>
+    </div>
 
-        <table class="payroll-table">
-            <thead>
+    <table class="payroll-table">
+        <thead>
+            <tr>
+                <th>Payroll ID</th>
+                <th>Employee Name</th>
+                <th>Position</th>
+                <th>Payroll Date</th>
+                <th>Deductions</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
+                        <td><?= htmlspecialchars($row['employee_name']) ?></td>
+                        <td><?= htmlspecialchars($row['position']) ?></td>
+                        <td><?= htmlspecialchars($row['date']) ?></td>
+                        <td><?= htmlspecialchars($row['deduction_name'] . ' - ' . $row['amount']) ?></td>
+                        <td class="action-buttons">
+                            <button class="edit" onclick="editPayroll(<?= $row['id'] ?>)">✏️</button>
+                            <a href="?delete_id=<?= $row['id'] ?>" class="delete" onclick="return confirm('Are you sure you want to delete this record?')">❌</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
                 <tr>
-                    <th>Payroll ID</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Type</th>
-                    <th>Action</th>
+                    <td colspan="6">No payroll records found for the selected date range.</td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $row['id'] . "</td>";
-                        echo "<td>" . $row['date_from'] . "</td>";
-                        echo "<td>" . $row['date_to'] . "</td>";
-                        echo "<td>" . $row['payroll_type'] . "</td>";
-                        echo "<td class='action-buttons'>
-                                <button class='edit' onclick='editPayroll(" . $row['id'] . ", \"" . $row['date_from'] . "\", \"" . $row['date_to'] . "\", \"" . $row['payroll_type'] . "\")'>✏️</button>
-                                <a href='#' class='delete' onclick='showDeleteConfirmation(" . $row['id'] . ")'><img src='./assets/images/delete.png' alt='delete' style='height: 25px; width: 25px; padding-top: 5px'></a>
-                              </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='5'>No payroll records found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</main>
 
-    </main>
-    
-    <!-- footer -->
-    <?php include_once("./includes/footer.php"); ?>
-
-    <!-- Modal for Add/Edit Payroll -->
-<div id="newPayrollModal" class="modal">
+<!-- Add Payroll Date Modal -->
+<div id="addPayrollModal" class="modal">
     <div class="modal-content">
-        <h2 id="modalHeader">Add Payroll</h2>
-        <form id="payrollForm" onsubmit="event.preventDefault(); savePayroll();">
-            <div class="modal-body">
-                <!-- From Date -->
-                <div class="form-group">
-                    <label for="dateFrom">From:</label>
-                    <input type="date" id="dateFrom" name="dateFrom" required placeholder="Select Start Date">
-                </div>
-
-                <!-- To Date -->
-                <div class="form-group">
-                    <label for="dateTo">To:</label>
-                    <input type="date" id="dateTo" name="dateTo" required placeholder="Select End Date">
-                </div>
-
-                <!-- Payroll Type -->
-                <div class="form-group">
-                    <label for="payrollType">Type:</label>
-                    <input type="text" id="payrollType" name="payrollType" required placeholder="Enter Payroll Type">
-                </div>
-            </div>
-            
-            <!-- Modal Footer with Buttons -->
-            <div class="modal-footer">
-                <button type="submit" class="save-btn">Save Payroll</button>
-                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-            </div>
+        <h2>Add Payroll Date</h2>
+        <form method="POST" action="payrollList.php">
+            <input type="date" name="payroll_date" required>
+            <button type="submit" name="add_payroll_date">Add</button>
+            <button type="button" class="close-btn" onclick="closeModal()">Close</button>
         </form>
     </div>
 </div>
 
+<!-- Edit Payroll Modal -->
+<div id="editPayrollModal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Payroll Record</h2>
+        <form method="POST" action="payrollList.php">
+            <input type="hidden" name="payroll_id" id="edit_payroll_id">
+            <label for="edit_payroll_date">Payroll Date</label>
+            <input type="date" name="payroll_date" id="edit_payroll_date" required>
+            <button type="submit" name="edit_payroll">Update</button>
+            <button type="button" class="close-btn" onclick="closeEditModal()">Close</button>
+        </form>
+    </div>
+</div>
 
-    <script>
-        let editingPayrollId = null;
+<!-- footer -->
+<?php include_once("./includes/footer.php"); ?>
 
-        function showModal() {
-            document.getElementById('newPayrollModal').style.display = 'flex';
-            document.getElementById('modalHeader').textContent = "New Payroll";
-            document.getElementById('dateFrom').value = '';
-            document.getElementById('dateTo').value = '';
-            document.getElementById('payrollType').value = '';
-            editingPayrollId = null; // Reset the ID when adding a new payroll
-        }
+<script>
+    function showModal() {
+        document.getElementById('addPayrollModal').style.display = 'block';
+    }
 
-        function closeModal() {
-            document.getElementById('newPayrollModal').style.display = 'none';
-        }
+    function closeModal() {
+        document.getElementById('addPayrollModal').style.display = 'none';
+    }
 
-        function savePayroll() {
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-            const payrollType = document.getElementById('payrollType').value;
+    function editPayroll(id) {
+        // Pre-fill the form for editing
+        document.getElementById('edit_payroll_id').value = id;
 
-            const formData = new FormData();
-            
-            // Check if we're editing or adding
-            formData.append('action', editingPayrollId ? 'edit' : 'add');
-            
-            // If editing, include the payroll ID
-            if (editingPayrollId) {
-                formData.append('payrollId', editingPayrollId);
-            }
+        // You may fetch payroll date dynamically with AJAX here based on `id`
+        document.getElementById('edit_payroll_date').value = '2024-12-01'; // Example value for now
 
-            formData.append('dateFrom', dateFrom);
-            formData.append('dateTo', dateTo);
-            formData.append('payrollType', payrollType);
+        document.getElementById('editPayrollModal').style.display = 'block';
+    }
 
-            fetch('payrollList.php', {
-                method: 'POST',
-                body: formData,
-            }).then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                    window.location.reload(); // Reload the page to reflect changes
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-            });
-        }
+    function closeEditModal() {
+        document.getElementById('editPayrollModal').style.display = 'none';
+    }
+</script>
 
-        function editPayroll(id, dateFrom, dateTo, payrollType) {
-            document.getElementById('newPayrollModal').style.display = 'flex';
-            document.getElementById('modalHeader').textContent = "Edit Payroll";
-            document.getElementById('dateFrom').value = dateFrom;
-            document.getElementById('dateTo').value = dateTo;
-            document.getElementById('payrollType').value = payrollType;
-            editingPayrollId = id;
-        }
-
-        function showDeleteConfirmation(id) {
-            if (confirm("Are you sure you want to delete this payroll?")) {
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('payrollId', id);
-
-                fetch('payrollList.php', {
-                    method: 'POST',
-                    body: formData,
-                }).then(response => response.json())
-                  .then(data => {
-                    if (data.success) {
-                        window.location.reload(); // Reload to remove deleted payroll
-                    } else {
-                        alert('Failed to delete payroll: ' + data.message);
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
-            }
-        }
-    </script>
 </body>
 </html>
