@@ -33,17 +33,21 @@ if (isset($_GET['employee_id'])) {
             e.position, 
             e.monthly_salary, 
             (e.monthly_salary - COALESCE(SUM(d.amount), 0)) AS net_salary, 
-            e.email, -- Add email field
+            e.email, 
             b.branch_name, 
             b.department_manager, 
             b.department_address,
-            COALESCE(SUM(d.amount), 0) AS total_deductions
+            COALESCE(SUM(d.amount), 0) AS total_deductions,
+            p.id AS payroll_id,
+            p.date_from,  -- Added date_from
+            p.date_to     -- Added date_to
         FROM employees e
         LEFT JOIN branch_employee be ON e.id = be.employee_id
         LEFT JOIN branch b ON be.branch_id = b.id
         LEFT JOIN deduction d ON e.id = d.employee_id
+        LEFT JOIN payroll p ON e.id = p.employee_id  -- Assuming employee_id is a foreign key in payroll
         WHERE e.id = ?
-        GROUP BY e.id
+        GROUP BY e.id, p.id
     ";
 
     $stmt = $conn->prepare($salaryDetailsQuery);
@@ -218,6 +222,9 @@ if (isset($_GET['employee_id'])) {
                 <div id="salary-details" class="salary-details">
                     <p><strong>Employee Name:</strong> <?= htmlspecialchars($employeeData['employee_name']) ?></p>
                     <p><strong>Employee ID:</strong> <?= htmlspecialchars($employeeData['id']) ?></p>
+                    <p><strong>Payroll ID:</strong> <?= htmlspecialchars($employeeData['payroll_id']) ?></p>
+                    <p><strong>Payroll Date From:</strong> <?= htmlspecialchars($employeeData['date_from']) ?></p>
+                    <p><strong>Payroll Date To:</strong> <?= htmlspecialchars($employeeData['date_to']) ?></p>
                     <p><strong>Branch:</strong> <?= htmlspecialchars($employeeData['branch_name']) ?></p>
                     <p><strong>Manager:</strong> <?= htmlspecialchars($employeeData['department_manager']) ?></p>
                     <p><strong>Address:</strong> <?= htmlspecialchars($employeeData['department_address']) ?></p>

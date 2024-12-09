@@ -111,6 +111,6 @@
         <li><a href="branch.php">🏢 Branch</a></li>
         <li><a href="deductionList.php">➖ Deduction</a></li>
         <li><a href="salarySlip.php">📄 Salary Slip</a></li>
-        <li><a href="user.php">👤 User</a></li>
+        <li><a href="user.php">👤 Profile</a></li>
     </ul>
 </div>
